@@ -1,18 +1,20 @@
 import streamlit as st
 import pandas as pd
-import preprocessor, helper
 import matplotlib.pyplot as plt
 import seaborn as sns
 from wordcloud import WordCloud
+import preprocessor, helper
 
-# Set Seaborn color palette
-colors = sns.color_palette("pastel")
+st.set_page_config(page_title="WhatsApp Chat Analyzer", layout="wide")
+
+# Set Seaborn palette
+sns.set_palette("pastel")
 
 # Sidebar navigation
 st.sidebar.title("Navigation")
 page = st.sidebar.radio("Go to", ["Home", "Analysis", "Insights & Report"])
 
-# ---------------------- HOME PAGE ----------------------
+# ----------------- HOME PAGE -----------------
 if page == "Home":
     st.markdown("""
         <div style="background-color:#6C63FF;padding:25px;border-radius:15px">
@@ -24,32 +26,32 @@ if page == "Home":
 
     st.markdown("### Welcome to WhatsApp Chat Analyzer!")
     st.write("""
-    This interactive site allows you to analyze your WhatsApp chats in a visually appealing and informative way.
+    Analyze your WhatsApp chats with beautiful visualizations and insights.
     
     **Features include:**
-    - Top statistics: total messages, words, media shared, links shared.
-    - Timelines: monthly and daily message trends.
-    - Activity maps: most active days and months.
-    - WordClouds and emoji analysis.
-    - Peak chatting hours visualization.
-    - AI-style smart insights and summary reports.
+    - Top statistics: total messages, words, media shared, links shared
+    - Monthly and daily timelines
+    - Activity maps: busiest days and months
+    - WordClouds and emoji analysis
+    - Peak chatting hours
+    - AI-style smart insights
+    - Downloadable summary report
     """)
 
     st.markdown("### Quick Guide")
     st.write("""
-    1. Export your WhatsApp chat (.txt) from your phone.
-    2. Navigate to the 'Analysis' page and upload your file.
+    1. Export your WhatsApp chat (.txt) file from your phone.
+    2. Go to the 'Analysis' page and upload the file.
     3. Select a user (or 'Overall') to analyze.
-    4. Click 'Show Analysis' to view statistics, timelines, wordclouds, and charts.
-    5. Go to 'Insights & Report' to get smart insights and download a summary report.
+    4. Click 'Show Analysis' to view charts and statistics.
+    5. Visit 'Insights & Report' page to get smart insights and download a summary report.
     """)
 
-# ---------------------- ANALYSIS PAGE ----------------------
+# ----------------- ANALYSIS PAGE -----------------
 elif page == "Analysis":
-    uploaded_file = st.file_uploader("Choose a WhatsApp chat file (.txt)", type=["txt"])
+    uploaded_file = st.file_uploader("Choose a WhatsApp chat file (.txt)", type=["txt"], key="analysis")
     if uploaded_file is not None:
-        bytes_data = uploaded_file.getvalue()
-        data = bytes_data.decode("utf-8", errors='ignore')
+        data = uploaded_file.getvalue().decode("utf-8", errors='ignore')
         df = preprocessor.preprocess(data)
 
         # User selection
@@ -61,13 +63,14 @@ elif page == "Analysis":
         selected_user = st.selectbox("Select User", user_list)
 
         if st.button("Show Analysis"):
+
             # -------- Top Stats --------
-            num_messages, words, num_media_messages, num_links = helper.fetch_stats(selected_user, df)
+            num_messages, words, num_media, num_links = helper.fetch_stats(selected_user, df)
             st.markdown("<h3 style='color:#FF5733;'>📊 Top Statistics</h3>", unsafe_allow_html=True)
             col1, col2, col3, col4 = st.columns(4)
             col1.metric("Total Messages", num_messages)
             col2.metric("Total Words", words)
-            col3.metric("Media Shared", num_media_messages)
+            col3.metric("Media Shared", num_media)
             col4.metric("Links Shared", num_links)
 
             # -------- Monthly Timeline --------
@@ -154,12 +157,11 @@ elif page == "Analysis":
                 )
                 st.pyplot(fig)
 
-# ---------------------- INSIGHTS & REPORT PAGE ----------------------
+# ----------------- INSIGHTS & REPORT PAGE -----------------
 elif page == "Insights & Report":
-    uploaded_file = st.file_uploader("Choose a WhatsApp chat file (.txt)", type=["txt"])
+    uploaded_file = st.file_uploader("Upload your WhatsApp chat file (.txt)", type=["txt"], key="insights")
     if uploaded_file is not None:
-        bytes_data = uploaded_file.getvalue()
-        data = bytes_data.decode("utf-8", errors='ignore')
+        data = uploaded_file.getvalue().decode("utf-8", errors='ignore')
         df = preprocessor.preprocess(data)
 
         # User selection
@@ -171,12 +173,13 @@ elif page == "Insights & Report":
         selected_user = st.selectbox("Select User", user_list)
 
         if st.button("Show Insights"):
+            # Smart insights
             st.markdown("<h3 style='color:#FF5733;'>🧠 Smart Insights</h3>", unsafe_allow_html=True)
             insights = helper.smart_insights(selected_user, df)
             for insight in insights:
                 st.write(insight)
 
-            # Download Summary Report
+            # Downloadable summary report
             num_messages, words, num_media_messages, num_links = helper.fetch_stats(selected_user, df)
             busy_day = helper.week_activity_map(selected_user, df).idxmax()
             busy_month = helper.month_activity_map(selected_user, df).idxmax()
@@ -214,4 +217,6 @@ elif page == "Insights & Report":
                 file_name="whatsapp_chat_report.csv",
                 mime="text/csv"
             )
+
+
 
