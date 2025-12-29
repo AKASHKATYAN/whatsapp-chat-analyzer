@@ -5,6 +5,7 @@ from collections import Counter
 from urlextract import URLExtract
 import emoji
 import seaborn as sns
+import streamlit as st
 
 extract = URLExtract()
 sns.set_palette("pastel")
