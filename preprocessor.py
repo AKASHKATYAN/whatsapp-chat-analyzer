@@ -2,6 +2,7 @@ import pandas as pd
 import re
 
 def preprocess(data):
+    # Regex to extract timestamps
     pattern = r'\d{1,2}/\d{1,2}/\d{2,4},\s\d{1,2}:\d{2}(?:\s?(?:am|pm))?\s-\s'
 
     messages = re.split(pattern, data)[1:]
@@ -12,18 +13,17 @@ def preprocess(data):
         'message_date': dates
     })
 
-    # Convert all messages to string
+    # Ensure messages are strings
     df['user_messages'] = df['user_messages'].astype(str)
 
-    # Convert message_date to string and handle missing values
-    df['message_date'] = df['message_date'].astype(str).fillna('')
+    # Make message_date string safely; replace NaN with empty string
+    df['message_date'] = df['message_date'].apply(lambda x: str(x) if pd.notnull(x) else '')
 
-    # Apply string operations safely
+    # Now safely use .str methods
     df['message_date'] = pd.to_datetime(
-        df['message_date']
-          .str.replace('\u202f', ' ', regex=False)
-          .str.replace(' -', '', regex=False)
-          .str.strip(),
+        df['message_date'].str.replace('\u202f', ' ', regex=False)
+                       .str.replace(' -', '', regex=False)
+                       .str.strip(),
         dayfirst=True,
         errors='coerce'
     )
@@ -45,7 +45,6 @@ def preprocess(data):
 
     df['users'] = users
     df['messages'] = messages_list
-    df.drop(columns='user_messages', inplace=True)
 
     # Ensure messages are strings
     df['messages'] = df['messages'].astype(str)
@@ -60,4 +59,5 @@ def preprocess(data):
     df['only_date'] = df['date'].dt.date
 
     return df
+
 
