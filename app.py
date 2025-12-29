@@ -19,7 +19,7 @@ if uploaded_file is not None:
     else:
         # Handle regular txt file
         bytes_data = uploaded_file.getvalue()
-        data = bytes_data.decode('utf-8', errors='ignore')
+        data = bytes_data.decode("utf-8-sig", errors='ignore')
     
     # Preprocess chat
     df = preprocessor.preprocess(data)
