@@ -5,6 +5,14 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from wordcloud import WordCloud
 
+st.markdown("""
+    <div style="background-color:#6C63FF;padding:20px;border-radius:10px">
+        <h1 style="color:white;text-align:center;font-family:Arial, Helvetica, sans-serif;">
+            📱 WhatsApp Chat Analyzer
+        </h1>
+    </div>
+""", unsafe_allow_html=True)
+
 # Set Seaborn color palette
 colors = sns.color_palette("pastel")  # try "bright", "muted", "deep" for variation
 
@@ -13,7 +21,7 @@ st.sidebar.title('WHATSAPP CHAT ANALYZER')
 uploaded_file = st.sidebar.file_uploader("Choose a file")
 if uploaded_file is not None:
     bytes_data = uploaded_file.getvalue()
-    data = bytes_data.decode("utf-8-sig")  # Safe decoding
+    data = bytes_data.decode("utf-8", errors='ignore')  # Safe decoding
     df = preprocessor.preprocess(data)
 
     # Fetch users
@@ -146,3 +154,4 @@ if uploaded_file is not None:
         insights = helper.smart_insights(selected_user, df)
         for insight in insights:
             st.write(insight)
+
