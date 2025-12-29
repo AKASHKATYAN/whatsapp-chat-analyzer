@@ -2,16 +2,23 @@ import pandas as pd
 import re
 
 def preprocess(data):
+    # Regex pattern to detect timestamps
     pattern = r'\d{1,2}/\d{1,2}/\d{2,4},\s\d{1,2}:\d{2}(?:\s?(?:am|pm))?\s-\s'
 
+    # Split messages and dates
     messages = re.split(pattern, data)[1:]
     dates = re.findall(pattern, data)
 
+    # Create DataFrame
     df = pd.DataFrame({
         'user_messages': messages,
         'message_date': dates
     })
 
+    # Ensure all messages are strings (prevents AttributeError)
+    df['user_messages'] = df['user_messages'].astype(str)
+
+    # Convert message_date to datetime
     df['message_date'] = pd.to_datetime(
         df['message_date']
           .str.replace('\u202f', ' ', regex=False)
@@ -20,9 +27,9 @@ def preprocess(data):
         dayfirst=True,
         errors='coerce'
     )
-
     df.rename(columns={'message_date': 'date'}, inplace=True)
 
+    # Split users and messages
     users = []
     messages = []
 
@@ -38,13 +45,17 @@ def preprocess(data):
     df['users'] = users
     df['messages'] = messages
     df.drop(columns='user_messages', inplace=True)
-    
 
+    # Ensure all messages are strings
+    df['messages'] = df['messages'].astype(str)
+
+    # Extract additional datetime features
     df['year'] = df['date'].dt.year
     df['month'] = df['date'].dt.month_name()
     df['month_num'] = df['date'].dt.month
     df['day'] = df['date'].dt.day
     df['day_name'] = df['date'].dt.day_name()
     df['hour'] = df['date'].dt.hour
-    df['only_date']=df['date'].dt.date
+    df['only_date'] = df['date'].dt.date
+
     return df
