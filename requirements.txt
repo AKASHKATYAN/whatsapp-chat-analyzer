@@ -5,6 +5,4 @@ matplotlib
 seaborn
 urlextract
 wordcloud
-re
-collections
 emoji
