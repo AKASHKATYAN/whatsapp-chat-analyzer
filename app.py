@@ -1,13 +1,29 @@
 import streamlit as st
 import preprocessor,helper
 import matplotlib.pyplot as plt
+import zipfile
+import io 
 
-st.sidebar.title('WHATSAPP CHAT ANALYZER')
-uploaded_file=st.sidebar.file_uploader("Choose a file")
+uploaded_file = st.sidebar.file_uploader("Choose a file (txt or zip)")
 if uploaded_file is not None:
-    bytes_data=uploaded_file.getvalue()
-    data=bytes_data.decode("utf-8-sig")
-    df=preprocessor.preprocess(data)
+    if uploaded_file.name.endswith('.zip'):
+        # Handle ZIP file
+        with zipfile.ZipFile(io.BytesIO(uploaded_file.read())) as z:
+            # Assume the first txt file is the chat
+            txt_files = [f for f in z.namelist() if f.endswith('.txt')]
+            if len(txt_files) == 0:
+                st.error("No txt file found inside the ZIP!")
+            else:
+                with z.open(txt_files[0]) as f:
+                    data = f.read().decode('utf-8', errors='ignore')
+    else:
+        # Handle regular txt file
+        bytes_data = uploaded_file.getvalue()
+        data = bytes_data.decode('utf-8', errors='ignore')
+    
+    # Preprocess chat
+    df = preprocessor.preprocess(data)
+
  
 #fetch users
     user_list=df['users'].unique().tolist()
