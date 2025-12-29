@@ -2,7 +2,6 @@ import pandas as pd
 import re
 
 def preprocess(data):
-    # Regex to extract timestamps
     pattern = r'\d{1,2}/\d{1,2}/\d{2,4},\s\d{1,2}:\d{2}(?:\s?(?:am|pm))?\s-\s'
 
     messages = re.split(pattern, data)[1:]
@@ -16,10 +15,10 @@ def preprocess(data):
     # Ensure messages are strings
     df['user_messages'] = df['user_messages'].astype(str)
 
-    # Make message_date string safely; replace NaN with empty string
-    df['message_date'] = df['message_date'].apply(lambda x: str(x) if pd.notnull(x) else '')
+    # Safely convert message_date to string only if not null
+    df['message_date'] = df['message_date'].apply(lambda x: str(x) if isinstance(x, str) else '')
 
-    # Now safely use .str methods
+    # Now it's safe to use .str methods
     df['message_date'] = pd.to_datetime(
         df['message_date'].str.replace('\u202f', ' ', regex=False)
                        .str.replace(' -', '', regex=False)
@@ -30,7 +29,6 @@ def preprocess(data):
 
     df.rename(columns={'message_date': 'date'}, inplace=True)
 
-    # Split users and messages
     users = []
     messages_list = []
 
@@ -46,10 +44,10 @@ def preprocess(data):
     df['users'] = users
     df['messages'] = messages_list
 
-    # Ensure messages are strings
+    # Ensure all messages are strings
     df['messages'] = df['messages'].astype(str)
 
-    # Extract additional datetime features
+    # Extract datetime features
     df['year'] = df['date'].dt.year
     df['month'] = df['date'].dt.month_name()
     df['month_num'] = df['date'].dt.month
@@ -59,6 +57,3 @@ def preprocess(data):
     df['only_date'] = df['date'].dt.date
 
     return df
-
-
-
