@@ -38,6 +38,7 @@ def preprocess(data):
     df['users'] = users
     df['messages'] = messages
     df.drop(columns='user_messages', inplace=True)
+    
 
     df['year'] = df['date'].dt.year
     df['month'] = df['date'].dt.month_name()
@@ -45,5 +46,5 @@ def preprocess(data):
     df['day'] = df['date'].dt.day
     df['day_name'] = df['date'].dt.day_name()
     df['hour'] = df['date'].dt.hour
-
+    df['only_date']=df['date'].dt.date
     return df
