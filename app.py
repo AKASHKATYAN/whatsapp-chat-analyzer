@@ -116,6 +116,25 @@ elif page == "Analysis":
                 plt.xticks(rotation=45)
                 sns.despine()
                 st.pyplot(fig)
+            
+            # ----------------- MOST ACTIVE USERS -----------------
+            if selected_user == "Overall":
+                st.markdown("### 👥 Most Active Users")
+
+                x, new_df = helper.most_busy_users(df)
+
+                col1, col2 = st.columns(2)
+
+                with col1:
+                    fig, ax = plt.subplots()
+                    ax.bar(x.index, x.values)
+                    plt.xticks(rotation=45)
+                    ax.set_ylabel("Messages")
+                    ax.set_title("Top Active Users")
+                    st.pyplot(fig)
+
+                with col2:
+                    st.dataframe(new_df)
 
             # WordCloud
             st.markdown("### 💬 WordCloud")
