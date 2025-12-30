@@ -20,12 +20,15 @@ def preprocess(data):
 
     # Now it's safe to use .str methods
     df['message_date'] = pd.to_datetime(
-        df['message_date'].str.replace('\u202f', ' ', regex=False)
-                       .str.replace(' -', '', regex=False)
-                       .str.strip(),
-        dayfirst=True,
-        errors='coerce'
-    )
+    df['message_date']
+        .fillna('')
+        .astype(str)
+        .str.replace('\u202f', ' ', regex=False)
+        .str.replace(' -', '', regex=False)
+        .str.strip(),
+    dayfirst=True,
+    errors='coerce'
+)
 
     df.rename(columns={'message_date': 'date'}, inplace=True)
 
